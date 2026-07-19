@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_freight_shipment_order_document">
+        <t t-call="web.basic_layout">
+            <t t-set="o" t-value="o.with_context(lang=o.partner_id.lang or env.lang)"/>
+
+            <div class="page o_freight_shipment_report">
+                <style>
+                    .o_freight_shipment_report {
+                        color: #1f2937;
+                        font-size: 13px;
+                    }
+                    .o_freight_shipment_report .fs-header {
+                        display: table;
+                        width: 100%;
+                        margin-bottom: 18px;
+                        padding-bottom: 12px;
+                        border-bottom: 3px solid #0f766e;
+                    }
+                    .o_freight_shipment_report .fs-header-left,
+                    .o_freight_shipment_report .fs-header-right {
+                        display: table-cell;
+                        vertical-align: middle;
+                    }
+                    .o_freight_shipment_report .fs-header-left {
+                        width: 55%;
+                    }
+                    .o_freight_shipment_report .fs-header-right {
+                        width: 45%;
+                        text-align: right;
+                    }
+                    .o_freight_shipment_report .fs-logo {
+                        max-height: 72px;
+                        max-width: 180px;
+                        width: auto;
+                        height: auto;
+                    }
+                    .o_freight_shipment_report .fs-brand {
+                        font-size: 18px;
+                        font-weight: 700;
+                        color: #0f172a;
+                        margin: 0 0 2px 0;
+                    }
+                    .o_freight_shipment_report .fs-brand-sub {
+                        font-size: 11px;
+                        color: #64748b;
+                        margin: 0;
+                    }
+                    .o_freight_shipment_report .fs-print-meta {
+                        font-size: 11px;
+                        color: #64748b;
+                        margin-top: 6px;
+                    }
+                    .o_freight_shipment_report .fs-customer-box {
+                        display: inline-block;
+                        text-align: left;
+                        background: #f8fafc;
+                        border: 1px solid #e5e7eb;
+                        border-radius: 8px;
+                        padding: 10px 12px;
+                        min-width: 220px;
+                    }
+                    .o_freight_shipment_report .fs-title {
+                        color: #0f172a;
+                        font-size: 26px;
+                        font-weight: 700;
+                        margin: 8px 0 18px 0;
+                        letter-spacing: -0.3px;
+                    }
+                    .o_freight_shipment_report .fs-title .fs-ref {
+                        color: #0f766e;
+                    }
+                    .o_freight_shipment_report .fs-badge {
+                        display: inline-block;
+                        padding: 3px 10px;
+                        border-radius: 999px;
+                        font-size: 11px;
+                        font-weight: 700;
+                        text-transform: uppercase;
+                        letter-spacing: 0.4px;
+                    }
+                    .o_freight_shipment_report .fs-badge-preparing { background: #e0f2fe; color: #0369a1; }
+                    .o_freight_shipment_report .fs-badge-with_courier { background: #fef3c7; color: #b45309; }
+                    .o_freight_shipment_report .fs-badge-on_the_way { background: #ede9fe; color: #6d28d9; }
+                    .o_freight_shipment_report .fs-badge-delivered { background: #dcfce7; color: #15803d; }
+                    .o_freight_shipment_report .fs-info-grid {
+                        border: 1px solid #e5e7eb;
+                        border-radius: 8px;
+                        padding: 14px 16px;
+                        margin-bottom: 18px;
+                        background: #f8fafc;
+                    }
+                    .o_freight_shipment_report .fs-info-label {
+                        display: block;
+                        font-size: 11px;
+                        font-weight: 700;
+                        color: #64748b;
+                        text-transform: uppercase;
+                        letter-spacing: 0.4px;
+                        margin-bottom: 4px;
+                    }
+                    .o_freight_shipment_report .fs-info-value {
+                        font-size: 14px;
+                        font-weight: 600;
+                        color: #0f172a;
+                    }
+                    .o_freight_shipment_report .fs-route {
+                        margin-bottom: 20px;
+                    }
+                    .o_freight_shipment_report .fs-route-card {
+                        border: 1px solid #d1d5db;
+                        border-radius: 8px;
+                        padding: 14px 16px;
+                        min-height: 92px;
+                        background: #ffffff;
+                    }
+                    .o_freight_shipment_report .fs-route-card.origin {
+                        border-left: 4px solid #0f766e;
+                    }
+                    .o_freight_shipment_report .fs-route-card.destination {
+                        border-left: 4px solid #1d4ed8;
+                    }
+                    .o_freight_shipment_report .fs-route-arrow {
+                        text-align: center;
+                        padding-top: 28px;
+                        font-size: 22px;
+                        color: #0f766e;
+                        font-weight: 700;
+                    }
+                    .o_freight_shipment_report .fs-section-title {
+                        font-size: 15px;
+                        font-weight: 700;
+                        color: #0f172a;
+                        margin: 0 0 10px 0;
+                        padding-bottom: 6px;
+                        border-bottom: 2px solid #0f766e;
+                        display: inline-block;
+                        min-width: 120px;
+                    }
+                    .o_freight_shipment_report .fs-cargo-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-top: 6px;
+                        margin-bottom: 16px;
+                    }
+                    .o_freight_shipment_report .fs-cargo-table thead th {
+                        background: #0f766e;
+                        color: #ffffff;
+                        padding: 9px 10px;
+                        font-size: 12px;
+                        text-transform: uppercase;
+                        letter-spacing: 0.3px;
+                        border: 1px solid #0f766e;
+                    }
+                    .o_freight_shipment_report .fs-cargo-table tbody td {
+                        padding: 9px 10px;
+                        border: 1px solid #d1d5db;
+                        vertical-align: middle;
+                    }
+                    .o_freight_shipment_report .fs-cargo-table tbody tr:nth-child(even) {
+                        background: #f8fafc;
+                    }
+                    .o_freight_shipment_report .fs-cargo-table tfoot td {
+                        padding: 10px;
+                        border: 1px solid #0f766e;
+                        background: #ecfdf5;
+                        font-weight: 700;
+                    }
+                    .o_freight_shipment_report .fs-kpi-row {
+                        margin: 8px 0 18px 0;
+                    }
+                    .o_freight_shipment_report .fs-kpi {
+                        border: 1px solid #d1d5db;
+                        border-radius: 8px;
+                        padding: 12px 10px;
+                        text-align: center;
+                        background: #ffffff;
+                    }
+                    .o_freight_shipment_report .fs-kpi .fs-kpi-label {
+                        display: block;
+                        font-size: 11px;
+                        color: #64748b;
+                        font-weight: 700;
+                        text-transform: uppercase;
+                        margin-bottom: 4px;
+                    }
+                    .o_freight_shipment_report .fs-kpi .fs-kpi-value {
+                        display: block;
+                        font-size: 18px;
+                        font-weight: 700;
+                        color: #0f766e;
+                    }
+                    .o_freight_shipment_report .fs-notes {
+                        border: 1px dashed #94a3b8;
+                        border-radius: 8px;
+                        padding: 12px 14px;
+                        background: #fffbeb;
+                        margin-bottom: 22px;
+                    }
+                    .o_freight_shipment_report .fs-sign-box {
+                        border: 1px solid #d1d5db;
+                        border-radius: 8px;
+                        padding: 14px;
+                        min-height: 110px;
+                        background: #ffffff;
+                    }
+                    .o_freight_shipment_report .fs-sign-line {
+                        border-top: 1px solid #94a3b8;
+                        margin-top: 55px;
+                        padding-top: 6px;
+                        font-size: 11px;
+                        color: #64748b;
+                    }
+                    .o_freight_shipment_report .fs-footer-note {
+                        margin-top: 18px;
+                        font-size: 11px;
+                        color: #64748b;
+                        text-align: center;
+                    }
+                </style>
+
+                <div class="fs-header">
+                    <div class="fs-header-left">
+                        <img class="fs-logo"
+                             t-att-src="'/freight_shipment/static/img/logo.png'"
+                             alt="Logo"/>
+                        <p class="fs-brand">Freight Shipment Management</p>
+                        <p class="fs-brand-sub">Shipment Order for the driver</p>
+                        <div class="fs-print-meta">
+                            Printed:
+                            <t t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d %H:%M')"/>
+                        </div>
+                    </div>
+                    <div class="fs-header-right">
+                        <div class="fs-customer-box" t-if="o.partner_id">
+                            <span class="fs-info-label">Customer</span>
+                            <div t-field="o.partner_id"
+                                 t-options='{"widget": "contact", "fields": ["address", "name", "phone", "email"], "no_marker": True, "phone_icons": True}'/>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="fs-title">
+                    Shipment Order
+                    <span class="fs-ref" t-field="o.name"/>
+                </h2>
+
+                <div class="row fs-info-grid" id="informations">
+                    <div class="col-3" t-if="o.partner_id">
+                        <span class="fs-info-label">Customer</span>
+                        <div class="fs-info-value" t-field="o.partner_id"/>
+                    </div>
+                    <div class="col-3" t-if="o.shipment_type_id">
+                        <span class="fs-info-label">Shipment Type</span>
+                        <div class="fs-info-value">
+                            <span t-field="o.shipment_type_id"/>
+                            <span t-if="o.shipment_type_category" class="text-muted">
+                                (<span t-field="o.shipment_type_category"/>)
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <span class="fs-info-label">Status</span>
+                        <div>
+                            <span t-attf-class="fs-badge fs-badge-#{o.state}" t-field="o.state"/>
+                        </div>
+                    </div>
+                    <div class="col-3" t-if="o.user_id">
+                        <span class="fs-info-label">Responsible</span>
+                        <div class="fs-info-value" t-field="o.user_id"/>
+                    </div>
+                </div>
+
+                <!-- Route -->
+                <div class="row fs-route">
+                    <div class="col-5">
+                        <div class="fs-route-card origin">
+                            <span class="fs-info-label">Origin</span>
+                            <div class="fs-info-value" t-field="o.origin"/>
+                            <div class="text-muted mt-1">
+                                Pickup:
+                                <span t-field="o.date_pickup"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="fs-route-arrow">→</div>
+                    </div>
+                    <div class="col-5">
+                        <div class="fs-route-card destination">
+                            <span class="fs-info-label">Destination</span>
+                            <div class="fs-info-value" t-field="o.destination"/>
+                            <div class="text-muted mt-1">
+                                Delivery:
+                                <span t-field="o.date_delivery"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KPI totals -->
+                <div class="row fs-kpi-row">
+                    <div class="col-4">
+                        <div class="fs-kpi">
+                            <span class="fs-kpi-label">Cargo Items</span>
+                            <span class="fs-kpi-value" t-field="o.cargo_count"/>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="fs-kpi">
+                            <span class="fs-kpi-label">Total Weight</span>
+                            <span class="fs-kpi-value">
+                                <span t-field="o.total_weight"/> kg
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="fs-kpi">
+                            <span class="fs-kpi-label">Total Volume</span>
+                            <span class="fs-kpi-value">
+                                <span t-field="o.total_volume"/> m3
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cargo table -->
+                <h3 class="fs-section-title">Cargo Items</h3>
+                <table class="fs-cargo-table" t-if="o.cargo_ids">
+                    <thead>
+                        <tr>
+                            <th class="text-start" style="width: 8%;">#</th>
+                            <th class="text-start" style="width: 44%;">Description</th>
+                            <th class="text-end" style="width: 16%;">Qty</th>
+                            <th class="text-end" style="width: 16%;">Weight (kg)</th>
+                            <th class="text-end" style="width: 16%;">Volume (m3)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="o.cargo_ids" t-as="line">
+                            <td class="text-start">
+                                <span t-esc="line_index + 1"/>
+                            </td>
+                            <td class="text-start">
+                                <span t-field="line.name"/>
+                            </td>
+                            <td class="text-end">
+                                <span t-field="line.quantity" t-options='{"widget": "float", "precision": 2}'/>
+                            </td>
+                            <td class="text-end">
+                                <span t-field="line.weight" t-options='{"widget": "float", "precision": 2}'/>
+                            </td>
+                            <td class="text-end">
+                                <span t-field="line.volume" t-options='{"widget": "float", "precision": 3}'/>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="2" class="text-end">Totals</td>
+                            <td class="text-end">
+                                <span t-esc="'%.2f' % sum(o.cargo_ids.mapped('quantity'))"/>
+                            </td>
+                            <td class="text-end">
+                                <span t-field="o.total_weight" t-options='{"widget": "float", "precision": 2}'/>
+                            </td>
+                            <td class="text-end">
+                                <span t-field="o.total_volume" t-options='{"widget": "float", "precision": 3}'/>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <div t-else="" class="text-muted mb-3">
+                    No cargo items recorded on this shipment.
+                </div>
+
+                <!-- Notes -->
+                <div t-if="o.notes" class="fs-notes">
+                    <span class="fs-info-label">Internal Notes</span>
+                    <div t-field="o.notes"/>
+                </div>
+
+                <!-- Driver / receiver signatures -->
+                <h3 class="fs-section-title">Handover Confirmation</h3>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="fs-sign-box">
+                            <span class="fs-info-label">Driver</span>
+                            <div class="fs-sign-line">Name / Signature / Date</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="fs-sign-box">
+                            <span class="fs-info-label">Receiver</span>
+                            <div class="fs-sign-line">Name / Signature / Date</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fs-footer-note">
+                    This shipment order is generated from Freight Shipment Management.
+                    Please verify cargo quantities, weight, and destination before dispatch.
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="report_freight_shipment_order">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="freight_shipment.report_freight_shipment_order_document"/>
+        </t>
+    </template>
+</odoo>

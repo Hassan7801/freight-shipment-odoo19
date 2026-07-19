@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="shipment_type_road" model="freight.shipment.type">
+        <field name="name">Road Freight</field>
+        <field name="code">ROAD</field>
+        <field name="category">road</field>
+        <field name="description">Standard road transport for palletised and general cargo.</field>
+    </record>
+    <record id="shipment_type_air" model="freight.shipment.type">
+        <field name="name">Air Freight</field>
+        <field name="code">AIR</field>
+        <field name="category">air</field>
+        <field name="description">Time-critical air cargo.</field>
+    </record>
+    <record id="shipment_type_ocean" model="freight.shipment.type">
+        <field name="name">Ocean Freight</field>
+        <field name="code">OCEAN</field>
+        <field name="category">ocean</field>
+        <field name="description">Container and break-bulk ocean transport.</field>
+    </record>
+    <record id="shipment_type_parcel" model="freight.shipment.type">
+        <field name="name">Parcel</field>
+        <field name="code">PARCEL</field>
+        <field name="category">parcel</field>
+        <field name="description">Small-package courier deliveries.</field>
+    </record>
+</odoo>

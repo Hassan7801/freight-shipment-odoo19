@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="demo_partner_acme" model="res.partner">
+        <field name="name">ACME Logistics Client</field>
+        <field name="email">ops@acme-demo.example</field>
+        <field name="is_company" eval="True"/>
+    </record>
+
+    <record id="demo_shipment_preparing" model="freight.shipment">
+        <field name="partner_id" ref="demo_partner_acme"/>
+        <field name="shipment_type_id" ref="shipment_type_road"/>
+        <field name="origin">Cairo Warehouse</field>
+        <field name="destination">Alexandria Depot</field>
+        <field name="date_pickup" eval="(DateTime.today()).strftime('%Y-%m-%d')"/>
+        <field name="date_delivery" eval="(DateTime.today() + relativedelta(days=2)).strftime('%Y-%m-%d')"/>
+        <field name="notes">Demo shipment still in preparation.</field>
+    </record>
+
+    <record id="demo_cargo_1" model="freight.shipment.cargo">
+        <field name="shipment_id" ref="demo_shipment_preparing"/>
+        <field name="name">Palletised electronics</field>
+        <field name="quantity">4</field>
+        <field name="weight">320.0</field>
+        <field name="volume">2.400</field>
+    </record>
+
+    <record id="demo_cargo_2" model="freight.shipment.cargo">
+        <field name="shipment_id" ref="demo_shipment_preparing"/>
+        <field name="name">Spare parts crates</field>
+        <field name="quantity">2</field>
+        <field name="weight">85.5</field>
+        <field name="volume">0.750</field>
+    </record>
+</odoo>

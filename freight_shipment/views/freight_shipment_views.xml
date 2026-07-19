@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form -->
+    <record id="view_freight_shipment_form" model="ir.ui.view">
+        <field name="name">freight.shipment.form</field>
+        <field name="model">freight.shipment</field>
+        <field name="arch" type="xml">
+            <form string="Shipment">
+                <header>
+                    <button name="%(freight_shipment.action_report_freight_shipment_order)d"
+                            type="action"
+                            string="Print Shipment Order"
+                            groups="freight_shipment.group_freight_shipment_user"/>
+                    <button name="action_send_to_courier"
+                            type="object"
+                            string="Hand to Courier"
+                            class="btn-primary"
+                            invisible="state != 'preparing'"
+                            groups="freight_shipment.group_freight_shipment_user"/>
+                    <button name="action_start_delivery"
+                            type="object"
+                            string="Start Delivery"
+                            class="btn-primary"
+                            invisible="state != 'with_courier'"
+                            groups="freight_shipment.group_freight_shipment_user"/>
+                    <button name="action_mark_delivered"
+                            type="object"
+                            string="Mark Delivered"
+                            class="btn-primary"
+                            invisible="state != 'on_the_way'"
+                            groups="freight_shipment.group_freight_shipment_user"/>
+                    <button name="action_reset_to_preparing"
+                            type="object"
+                            string="Reset to Preparing"
+                            invisible="state in ('preparing', 'delivered')"
+                            groups="freight_shipment.group_freight_shipment_manager"
+                            confirm="Reset this shipment back to Preparing?"/>
+                    <field name="state" widget="statusbar"
+                            statusbar_visible="preparing,with_courier,on_the_way,delivered"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Request">
+                            <field name="partner_id"/>
+                            <field name="shipment_type_id"/>
+                            <field name="shipment_type_category"/>
+                            <field name="user_id" widget="many2one_avatar_user"/>
+                        </group>
+                        <group string="Route &amp; Schedule">
+                            <field name="origin" placeholder="e.g. Cairo Warehouse"/>
+                            <field name="destination" placeholder="e.g. Alexandria Port"/>
+                            <field name="date_pickup"/>
+                            <field name="date_delivery"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Totals">
+                            <field name="cargo_count"/>
+                            <field name="total_weight"/>
+                            <field name="total_volume"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Cargo" name="cargo">
+                            <field name="cargo_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="quantity"/>
+                                    <field name="weight"/>
+                                    <field name="volume"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="notes" placeholder="Internal notes for the logistics team..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List -->
+    <record id="view_freight_shipment_list" model="ir.ui.view">
+        <field name="name">freight.shipment.list</field>
+        <field name="model">freight.shipment</field>
+        <field name="arch" type="xml">
+            <list string="Shipments"
+                  decoration-info="state == 'preparing'"
+                  decoration-warning="state == 'with_courier'"
+                  decoration-primary="state == 'on_the_way'"
+                  decoration-success="state == 'delivered'">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="shipment_type_id"/>
+                <field name="origin"/>
+                <field name="destination"/>
+                <field name="date_pickup"/>
+                <field name="date_delivery"/>
+                <field name="total_weight"/>
+                <field name="total_volume"/>
+                <field name="state"
+                         widget="badge"
+                         decoration-info="state == 'preparing'"
+                         decoration-warning="state == 'with_courier'"
+                         decoration-primary="state == 'on_the_way'"
+                         decoration-success="state == 'delivered'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Kanban: every lifecycle stage stays visible even when empty -->
+    <record id="view_freight_shipment_kanban" model="ir.ui.view">
+        <field name="name">freight.shipment.kanban</field>
+        <field name="model">freight.shipment</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state"
+                    class="o_kanban_small_column"
+                    sample="1"
+                    records_draggable="0">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="shipment_type_id"/>
+                <field name="origin"/>
+                <field name="destination"/>
+                <field name="date_pickup"/>
+                <field name="date_delivery"/>
+                <field name="total_weight"/>
+                <field name="total_volume"/>
+                <field name="state"/>
+                <field name="cargo_count"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <strong>
+                                <field name="name"/>
+                            </strong>
+                            <span class="badge text-bg-secondary">
+                                <field name="shipment_type_id"/>
+                            </span>
+                        </div>
+                        <div class="text-muted">
+                            <field name="partner_id"/>
+                        </div>
+                        <div class="mt-1">
+                            <i class="fa fa-map-marker me-1" title="Route"/>
+                            <field name="origin"/> -&gt; <field name="destination"/>
+                        </div>
+                        <div class="mt-1 text-muted small">
+                            Pickup: <field name="date_pickup"/>
+                            · Delivery: <field name="date_delivery"/>
+                        </div>
+                        <div class="mt-2 d-flex justify-content-between small">
+                            <span>
+                                <t t-esc="record.cargo_count.value"/> item(s)
+                            </span>
+                            <span>
+                                <t t-esc="record.total_weight.value"/> kg
+                                ·
+                                <t t-esc="record.total_volume.value"/> m3
+                            </span>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Search / filters -->
+    <record id="view_freight_shipment_search" model="ir.ui.view">
+        <field name="name">freight.shipment.search</field>
+        <field name="model">freight.shipment</field>
+        <field name="arch" type="xml">
+            <search string="Shipments">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="shipment_type_id"/>
+                <field name="origin"/>
+                <field name="destination"/>
+                <separator/>
+                <filter string="Preparing" name="state_preparing" domain="[('state', '=', 'preparing')]"/>
+                <filter string="With Courier" name="state_with_courier" domain="[('state', '=', 'with_courier')]"/>
+                <filter string="On the Way" name="state_on_the_way" domain="[('state', '=', 'on_the_way')]"/>
+                <filter string="Delivered" name="state_delivered" domain="[('state', '=', 'delivered')]"/>
+                <separator/>
+                <filter string="My Shipments" name="my_shipments" domain="[('user_id', '=', uid)]"/>
+                <filter string="Pickup Today" name="pickup_today"
+                        domain="[('date_pickup', '=', context_today())]"/>
+                <group>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Shipment Type" name="group_type" context="{'group_by': 'shipment_type_id'}"/>
+                    <filter string="Customer" name="group_customer" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Pickup Date" name="group_pickup" context="{'group_by': 'date_pickup'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_freight_shipment" model="ir.actions.act_window">
+        <field name="name">Shipments</field>
+        <field name="res_model">freight.shipment</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_freight_shipment_search"/>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Register a shipment request
+            </p>
+            <p>
+                Capture the customer, route, dates, and cargo items, then move the shipment through its delivery lifecycle.
+            </p>
+        </field>
+    </record>
+</odoo>

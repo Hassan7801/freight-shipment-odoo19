@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form -->
+    <record id="view_freight_shipment_type_form" model="ir.ui.view">
+        <field name="name">freight.shipment.type.form</field>
+        <field name="model">freight.shipment.type</field>
+        <field name="arch" type="xml">
+            <form string="Shipment Type">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_shipments"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-truck">
+                            <field name="shipment_count" widget="statinfo" string="Shipments"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. Road Freight"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="category"/>
+                        </group>
+                        <group>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <group string="Notes">
+                        <field name="description" nolabel="1" placeholder="Optional notes about this shipment type..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- List -->
+    <record id="view_freight_shipment_type_list" model="ir.ui.view">
+        <field name="name">freight.shipment.type.list</field>
+        <field name="model">freight.shipment.type</field>
+        <field name="arch" type="xml">
+            <list string="Shipment Types">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="category"/>
+                <field name="shipment_count"/>
+                <field name="active" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search -->
+    <record id="view_freight_shipment_type_search" model="ir.ui.view">
+        <field name="name">freight.shipment.type.search</field>
+        <field name="model">freight.shipment.type</field>
+        <field name="arch" type="xml">
+            <search string="Shipment Types">
+                <field name="name"/>
+                <field name="code"/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                <separator/>
+                <filter string="Road" name="cat_road" domain="[('category', '=', 'road')]"/>
+                <filter string="Air" name="cat_air" domain="[('category', '=', 'air')]"/>
+                <filter string="Ocean" name="cat_ocean" domain="[('category', '=', 'ocean')]"/>
+                <filter string="Parcel" name="cat_parcel" domain="[('category', '=', 'parcel')]"/>
+                <group>
+                    <filter string="Category" name="group_category" context="{'group_by': 'category'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_freight_shipment_type" model="ir.actions.act_window">
+        <field name="name">Shipment Types</field>
+        <field name="res_model">freight.shipment.type</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_freight_shipment_type_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first shipment type
+            </p>
+            <p>
+                Shipment types (Road, Air, Ocean, Parcel, ...) are configured here and reused on every shipment request.
+            </p>
+        </field>
+    </record>
+</odoo>
